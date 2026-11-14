@@ -338,7 +338,7 @@ fn component_stack_capacity_is_preserved_on_every_split() {
 }
 
 #[test]
-#[ignore = "needs prepared resources in HORIZON_TEST_RESOURCES"]
+#[ignore = "needs prepared resources in SUNRISE_TEST_RESOURCES"]
 fn odds_are_the_world_packs_table_judged_with_the_tool() {
     let mut resources = None;
     let (mut game, level) = game(&mut resources, "odds");

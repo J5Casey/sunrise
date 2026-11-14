@@ -83,7 +83,7 @@ pub struct LootStack {
 /// `LevelRef::loot_odds` works them out: for a recipe viewer that lists a table's outputs.
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
-#[derive(horizon_mod_api_macros::Wire)]
+#[derive(sunrise_mod_api_macros::Wire)]
 pub struct LootOdds {
     /// The item.
     pub item: ItemKey,
