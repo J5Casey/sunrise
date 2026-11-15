@@ -5296,6 +5296,7 @@ dependencies = [
  "regex",
  "sha1",
  "sha2",
+ "sunrise-core",
  "zip",
 ]
 
