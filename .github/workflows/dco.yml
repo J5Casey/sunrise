@@ -1,0 +1,27 @@
+name: DCO
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  dco:
+    # Mirrored upstream PRs and ari-fork merges carry MIT commits their authors never submitted here, so they skip it.
+    if: >-
+      !((startsWith(github.event.pull_request.head.ref, 'upstream/pr-')
+         || startsWith(github.event.pull_request.head.ref, 'sync/arismoko-'))
+        && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Every commit is signed off by its author
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: python3 tools/ci/dco_check.py "$BASE" "$HEAD"

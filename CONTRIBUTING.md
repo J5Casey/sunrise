@@ -249,6 +249,10 @@ for bugs. To take something on, `/claim` its issue ([above](#claim-before-you-st
 
 How Horizon is run, and how people join the Team or lead a group: [GOVERNANCE.md](GOVERNANCE.md).
 
-## Licence and CLA
+## Licence and DCO
 
-Sunrise's code is under the [PolyForm Shield licence](LICENSE). Before your first pull request is merged, sign the [Contributor License Agreement](CLA.md) by commenting on the pull request as the CLA check asks: you keep the copyright to what you write, and Sunrise may license it under other terms, which lets the project say yes to commercial uses the licence doesn't cover or change licence later.
+Sunrise's code is under the [PolyForm Shield licence](LICENSE), and so is what you contribute: it comes in under the same
+licence it goes out under, and you keep your copyright. There is no CLA. Instead, sign off every commit (`git commit -s`)
+to certify the [Developer Certificate of Origin](https://developercertificate.org/): that you wrote it, or have the
+right to submit it under the project's licence. The DCO check fails a pull request with a commit that isn't signed off;
+`git rebase --signoff origin/main` fixes a branch.
