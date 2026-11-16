@@ -79,6 +79,7 @@
     "sunrise-mod-api": "platform",
     "sunrise-mod-api-macros": "engine",
     "sunrise-mod-point-emit": "platform",
+    "sunrise-native-build": "sunrise",
     "sunrise-mod-point-shape": "engine",
     "sunrise-mod-surface": "engine",
     "sunrise-mod-source": "engine",
@@ -166,6 +167,7 @@
     "sunrise-launcher -> sunrise-protocol",
     "sunrise-launcher -> sunrise-mod-package",
     "sunrise-launcher -> sunrise-system",
+    "sunrise-native-build -> sunrise-mod-package",
     "sunrise-mod-registry -> sunrise-mod-package",
     "sunrise-client -> sunrise-cosmetics",
     "sunrise-client -> sunrise-telemetry"
