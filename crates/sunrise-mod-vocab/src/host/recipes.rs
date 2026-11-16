@@ -120,24 +120,26 @@ pub trait RecipesClientHost {
     #[access(WorldOnly)]
     fn transfer_recipe_id(&mut self, recipe: &str, max: bool);
     /// Side: client.
-    /// What `transfer_recipe(book_id)` would do now, worked out by the server
-    /// without moving anything: the player's inventory, the grid and every
+    /// What `transfer_recipe_id(recipe, false)` would do now for the recipe
+    /// with id `recipe` (`minecraft:stick`), worked out by the server without
+    /// moving anything: the open mod menu's `menu_transfer` part asked first,
+    /// then the grid, with the player's inventory, the grid and every
     /// container a mod lends the grid's recipes (a crafting station's chests,
-    /// which the client can't see) counted. For a viewer's "+", to mark the
-    /// inputs it lacks. The first call for a recipe asks and returns None;
-    /// the answer comes a moment later and is kept for that recipe while the
-    /// menu, the inventory and the grid stay as they were; while it is still
-    /// wanted it is asked again every two seconds, at most fifteen times for
-    /// one state of the menu. None outside a screen that
-    /// takes `transfer_recipe` and on a server that doesn't answer it.
+    /// which the client can't see) counted. Any recipe the server knows,
+    /// whether or not the player's recipe book holds it. For a viewer's "+",
+    /// to mark the inputs it lacks. The first call for a recipe asks and
+    /// returns None; the answer comes a moment later and is kept for that
+    /// recipe while the menu, the inventory and the grid stay as they were;
+    /// while it is still wanted it is asked again every two seconds, at most
+    /// fifteen times for one state of the menu. None outside a screen that
+    /// takes `transfer_recipe_id` and on a server that doesn't answer it.
     #[access(WorldOnly)]
-    fn transfer_recipe_check(&mut self, book_id: i32) -> Option<RecipeTransferCheck>;
+    fn transfer_recipe_check(&mut self, recipe: &str) -> Option<RecipeTransferCheck>;
     /// Side: client.
     /// The `book_id`s of the recipe `recipe_id` (`minecraft:stick`), the ids
-    /// `transfer_recipe`, `transfer_recipe_check`, `place_recipe` and
-    /// `known_recipes` use: one for each way the recipe book shows it, in the
-    /// book's order. For a recipe viewer, which has the recipe from
-    /// `recipes_of_type` and needs its id for "+". A server numbers its
+    /// `transfer_recipe`, `place_recipe` and `known_recipes` use: one for each
+    /// way the recipe book shows it, in the book's order. For a recipe viewer,
+    /// which has the recipe from `recipes_of_type`. A server numbers its
     /// recipes itself and names none of them, so an id is given only when the
     /// server sent the recipe book entry with that number and this client's
     /// own numbering of the recipe agrees with it: the entry is the same

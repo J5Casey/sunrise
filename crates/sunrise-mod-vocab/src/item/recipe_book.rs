@@ -36,7 +36,8 @@ pub struct RecipeBookCategory {
 }
 
 /// What a recipe viewer's transfer into the open crafting grid does or would
-/// do (`RecipesClientHost::transfer_recipe`, `transfer_recipe_check`).
+/// do (`RecipesClientHost::transfer_recipe`, `transfer_recipe_id`,
+/// `transfer_recipe_check`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 // exhaustive: the four answers of Sunrise's transfer channels, matched without a wildcard
 #[derive(sunrise_mod_api_macros::Wire)]
