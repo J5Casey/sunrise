@@ -497,7 +497,7 @@ impl GameLevel<'_> {
         self.fire_perform_bonemeal(ticks, dimension, pos, state);
     }
 
-    /// On an authoritative server, `CampfireBlock.isSmokeSource` for the
+    /// On both sides, `CampfireBlock.isSmokeSource` for the
     /// block `state` under a campfire, as the campfire is placed or the block
     /// under it changes: `Some(true)` for your own blocks makes the campfire a
     /// signal fire whose smoke rises higher, as over a hay bale. The level is

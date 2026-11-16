@@ -24,6 +24,9 @@ impl<'w> DryLevel<'w> {
 impl sunrise_world::level::BlockEntityNeighbors for DryLevel<'_> {}
 
 impl sunrise_world::level::LevelAccess for DryLevel<'_> {
+    fn before_smoke_source(&self, state: BlockStateId, smoke: &mut Option<bool>) {
+        self.base.before_smoke_source(state, smoke);
+    }
     fn cake_can_eat(&self, vanilla: bool) -> bool {
         self.base.cake_can_eat(vanilla)
     }

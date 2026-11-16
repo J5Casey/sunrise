@@ -51,3 +51,11 @@ impl Hooks for MyMod {
 - Parts implement `Send + Sync + 'static`.
 - In `has_analog_output`, answer from the block state alone. In `analog_output`, do not change the
   world. The game clamps the comparator signal to the range 0 to 15.
+
+## Campfire smoke sources
+
+`BlockPart::smoke_source` answers whether its block makes a campfire above it a signal fire.
+Return `Some(true)` to enable signal smoke, `Some(false)` to refuse it, or `None` to keep
+vanilla's hay-bale check. Version 2 runs on the server and during client placement prediction.
+Its `LevelSide` supplies a read-only level on the asking side: answer from the supplied
+state and level, with no authoritative writes. Parts attached by tag use that side's tag view.

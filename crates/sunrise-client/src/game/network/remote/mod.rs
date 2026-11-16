@@ -15430,3 +15430,5 @@ mod movement_input_tests;
 #[cfg(test)]
 #[path = "player_tick_tests.rs"]
 mod player_tick_tests;
+#[cfg(test)]
+mod smoke_source_tests;

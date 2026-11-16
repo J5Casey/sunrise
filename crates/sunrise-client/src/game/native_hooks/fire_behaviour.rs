@@ -2,7 +2,7 @@ use super::*;
 
 /// The level's side of fire and lava ignition (`FireBlock`, `LavaFluid`), which `GameLevel`'s
 /// `LevelAccess` forwards to: the mods' answers on an authoritative server, and the level's own
-/// facts. A client's copy of the level asks no mod.
+/// facts. Only the smoke-source query also asks on the client for prediction.
 impl GameLevel<'_> {
     /// `allow_block_ignite`: the `block_ignite` hook's cancel.
     pub(in crate::game) fn block_ignite_allowed(&self, pos: BlockPos, cause: &'static str) -> bool {
@@ -79,9 +79,7 @@ impl GameLevel<'_> {
         state: BlockStateId,
         smoke: &mut Option<bool>,
     ) {
-        if self.native_authoritative {
-            self.native_smoke_source(self.dimension, state, smoke);
-        }
+        self.native_smoke_source(self.dimension, state, smoke);
     }
 
     /// `ServerLevel.canSpreadFireAround`: a player (not a spectator) closer
