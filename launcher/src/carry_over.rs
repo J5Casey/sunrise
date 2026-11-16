@@ -20,6 +20,12 @@ const LAUNCHER_STATE: [&str; 8] = [
     "wardrobe",
 ];
 
+/// What a game folder holds that the game makes again: its content cache (under the earlier
+/// launcher's name or this one's), compiled scripts and downloads. Not copied: a Horizon game
+/// folder's `.horizon-cache` is most of its files, and its entries are links into the earlier
+/// launcher's game builds, which a copy refuses.
+const GAME_CACHES: [&str; 4] = [".horizon-cache", ".sunrise-cache", "wasm-cache", "cache"];
+
 /// Runs [`carry_over`] on the player's folders before anything reads them, unless a home
 /// override or a moved Sunrise location decides where the data is. A failure is reported and
 /// leaves the launcher to start empty: the earlier launcher's data is untouched either way.
@@ -81,7 +87,7 @@ pub fn carry_over(data: &Path, config: &Path) -> Result<bool, String> {
             data_location::copy_tree(&from, &staged.launcher.join(name), &bootstrap, &mut quiet)?;
         }
     }
-    data_location::copy_tree(&source.game, &staged.game, &bootstrap, &mut quiet)?;
+    copy_game(&source.game, &staged.game, &bootstrap, &mut quiet)?;
     let target = Roots {
         launcher: launcher.clone(),
         game: game.clone(),
@@ -92,6 +98,35 @@ pub fn carry_over(data: &Path, config: &Path) -> Result<bool, String> {
     fs::rename(&staged.game, &game).map_err(|e| format!("{}: {e}", game.display()))?;
     let _ = fs::remove_dir_all(&stage);
     Ok(true)
+}
+
+/// Copies the earlier game folder `from` to `to`, all but its caches ([`GAME_CACHES`]).
+fn copy_game(
+    from: &Path,
+    to: &Path,
+    bootstrap: &Path,
+    progress: &mut impl FnMut(&str),
+) -> Result<(), String> {
+    let entries = match fs::read_dir(from) {
+        Ok(entries) => entries,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            return fs::create_dir_all(to).map_err(|e| format!("{}: {e}", to.display()));
+        }
+        Err(e) => return Err(format!("{}: {e}", from.display())),
+    };
+    fs::create_dir_all(to).map_err(|e| format!("{}: {e}", to.display()))?;
+    for entry in entries {
+        let entry = entry.map_err(|e| format!("{}: {e}", from.display()))?;
+        let name = entry.file_name();
+        if GAME_CACHES.iter().any(|cache| name == *cache) {
+            continue;
+        }
+        data_location::copy_tree(&entry.path(), &to.join(&name), bootstrap, progress)?;
+    }
+    let permissions = fs::metadata(from)
+        .map_err(|e| format!("{}: {e}", from.display()))?
+        .permissions();
+    fs::set_permissions(to, permissions).map_err(|e| format!("{}: {e}", to.display()))
 }
 
 /// An earlier launcher's folders, when its launcher or game folder exists: where its
@@ -159,6 +194,19 @@ mod tests {
         fs::write(from_launcher.join("cache/big.bin"), [7; 64]).unwrap();
         fs::write(from_game.join("saves/World/level.dat"), [1, 2, 3]).unwrap();
         fs::write(from_game.join("instances/modded/options.txt"), "fov:90").unwrap();
+        // A Horizon game folder's cache: files and links into the earlier launcher's builds.
+        fs::create_dir_all(from_game.join(".horizon-cache/mod-content")).unwrap();
+        fs::write(
+            from_game.join(".horizon-cache/mod-content/blocks.json"),
+            "{}",
+        )
+        .unwrap();
+        #[cfg(unix)]
+        std::os::unix::fs::symlink(
+            from_launcher.join("settings.json"),
+            from_game.join(".horizon-cache/mod-content/link.json"),
+        )
+        .unwrap();
         let before = (files(&from_launcher), files(&from_game));
 
         assert_eq!(carry_over(&data, &config), Ok(true));
@@ -179,6 +227,10 @@ mod tests {
         );
         assert!(launcher.join("accounts.json").is_file());
         assert!(!launcher.join("cache").exists(), "caches are made again");
+        assert!(
+            !game.join(".horizon-cache").exists(),
+            "the game's cache is made again"
+        );
         // A path into the earlier game folder now names the copy.
         let copied: serde_json::Value =
             serde_json::from_slice(&fs::read(launcher.join("settings.json")).unwrap()).unwrap();
