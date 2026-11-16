@@ -24,7 +24,7 @@ impl RecipesClientHost for Client {
     fn transfer_recipe_id(&mut self, _: &str, _: bool) {
         unreachable!()
     }
-    fn transfer_recipe_check(&mut self, _: i32) -> Option<RecipeTransferCheck> {
+    fn transfer_recipe_check(&mut self, _: &str) -> Option<RecipeTransferCheck> {
         unreachable!()
     }
     fn recipe_book_ids(&mut self, recipe_id: &str) -> Arc<[i32]> {

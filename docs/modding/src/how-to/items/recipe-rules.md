@@ -27,8 +27,8 @@ for a custom-type cache.
 
 ## Finding a recipe's recipe book ids
 
-A recipe viewer's "+" and its `transfer_recipe_check` and `place_recipe` take a
-recipe book id, which `Recipe` does not carry. `RecipesClientHost::recipe_book_ids`
+`transfer_recipe` and `place_recipe` take a recipe book id, which `Recipe`
+does not carry. `RecipesClientHost::recipe_book_ids`
 (`recipe_id`) returns the ids of a recipe's entries in the book, in the book's
 order.
 
@@ -45,5 +45,7 @@ world.
 The answer changes when the server adds, replaces or removes recipe book
 entries and when recipes reload or arrive, and no hook announces a recipe book
 change: query it when you use it, rather than keeping an answer from
-`recipes_received`. For a viewer's "+" by recipe id alone, use
-`transfer_recipe_id`.
+`recipes_received`. A viewer's "+" needs no book id: `transfer_recipe_id`
+moves any recipe the server knows by its id, and `transfer_recipe_check` (the
+same id) says beforehand what it would do, for a recipe the player's book holds
+or not.
