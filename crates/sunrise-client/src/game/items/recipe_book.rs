@@ -2325,15 +2325,15 @@ mod request_generation_tests {
     #[test]
     fn delayed_answers_cannot_match_inventory_changes_or_retries() {
         let mut checks = TransferChecks::default();
-        let first = checks.ask(42, Instant::now()).unwrap();
+        let first = checks.ask("minecraft:stick", Instant::now()).unwrap();
         checks = TransferChecks::default(); // Inventory change clears the cache.
-        let second = checks.ask(42, Instant::now()).unwrap();
+        let second = checks.ask("minecraft:stick", Instant::now()).unwrap();
         assert_ne!(first, second);
-        let retry = checks.ask(42, Instant::now()).unwrap();
+        let retry = checks.ask("minecraft:stick", Instant::now()).unwrap();
         assert_ne!(second, retry);
         assert_eq!(
-            checks.asked.map(|(tag, id, _)| (tag, id)),
-            Some((retry, 42))
+            (checks.asked.as_ref()).map(|(tag, id, _)| (*tag, id.as_str())),
+            Some((retry, "minecraft:stick"))
         );
     }
 }
