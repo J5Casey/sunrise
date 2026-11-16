@@ -209,11 +209,12 @@ impl Game<'_> {
             return None;
         }
         match self.container_kind() {
+            // The inventory's grid, or a crafting table's (`CraftingScreen`); a server's
+            // other menus have no crafting book.
             None if self.container.is_none()
-                && self
-                    .remote
-                    .as_ref()
-                    .is_none_or(|r| r.menu.as_ref().is_none()) =>
+                && self.remote.as_ref().is_none_or(|r| {
+                    (r.menu.as_ref()).is_none_or(|(_, menu)| menu == "minecraft:crafting")
+                }) =>
             {
                 Some(BookType::Crafting)
             }
