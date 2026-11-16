@@ -673,6 +673,26 @@ pub trait PlayersBackendMut {
         places: Vec<MenuSlotPlace>,
     ) -> Result<(), MenuSlotBackRefusal>;
     /// Side: server.
+    /// Opens the player's own ender chest for them with no block, titled `title`: a three-row
+    /// `ChestMenu` over their `PlayerEnderChestContainer`, as `EnderChestBlock.useWithoutItem`
+    /// opens it (`ChestMenu.threeRows`) but with no active chest, so it stays valid wherever
+    /// they go. An item's use, a command or a tick can open it. Its slots are the player's
+    /// ender chest itself: clicks, shift-clicks, drags and the close move stacks as an ender
+    /// chest block's menu does, and the game writes and saves them. The menu replaces the one
+    /// they had open, as `ServerPlayer.openMenu` does, and the mods may cancel it
+    /// (`player_container_open`). Inside a hook of the player's own action (`use_item`,
+    /// `right_click_item`, `right_click_block`, their command), the menu opens when that action
+    /// ends, as a block's menu the same action opens does. Ok(true) when it opened or will open
+    /// at the end of the action, Ok(false) when a mod cancelled it. Errors:
+    /// `PlayerUnavailable` (stale, dead, fake, or on a client), or `Title` for a title that
+    /// could not cross; nothing opens then.
+    #[access(WorldOnly)]
+    fn player_open_ender_chest(
+        &mut self,
+        player: PlayerRef,
+        title: Text,
+    ) -> Result<bool, OpenMenuError>;
+    /// Side: server.
     /// Sends the player `uuid` the whole picture of map `map_id`: 128 x 128
     /// colours (`MapColor` ids times 4 plus the shade, row by row), scale 0,
     /// locked, no decorations, as `ClientboundMapItemDataPacket`. A filled

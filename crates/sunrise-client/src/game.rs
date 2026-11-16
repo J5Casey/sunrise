@@ -1932,6 +1932,10 @@ struct Game<'a> {
     save_after_guest_turn: bool,
     /// Guests whose records are displaced by nested player swaps, outer first.
     lan_guest_swaps: Vec<u32>,
+    /// Ender chests a mod opened for a guest inside that guest's turn
+    /// (`player_open_ender_chest`), by connection, with their titles: opened as the turn
+    /// ends, once the guest's own ender chest is back in their record.
+    lan_ender_menus: Vec<(u32, sunrise_core::nbt::Tag)>,
     /// Live attachments and original snapshots retained during player replacement.
     player_state: original_player::PlayerState,
     /// The block the acting player is breaking (`break_block`): its destroy
@@ -11148,6 +11152,7 @@ impl<'a> Game<'a> {
             lan_building_boxes: Default::default(),
             save_after_guest_turn: false,
             lan_guest_swaps: Vec::new(),
+            lan_ender_menus: Vec::new(),
             player_state: Default::default(),
             lan_break_pos: None,
             break_collect: None,

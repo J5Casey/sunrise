@@ -104,7 +104,7 @@ impl Game<'_> {
     /// `ServerPlayer.openMenu`'s close of the menu that was open: `closeContainer`, which then
     /// tells the client, or `doCloseContainer` for a provider that skips the client's close.
     /// Either way the old menu's `removed` runs and the mods hear it close.
-    fn close_for_open(&mut self, conn: u32, replace: MenuReplace) {
+    pub(super) fn close_for_open(&mut self, conn: u32, replace: MenuReplace) {
         match replace {
             MenuReplace::CloseFirst => self.guest_close_menus_and_tell(conn),
             MenuReplace::InPlace => self.guest_close_all(conn),

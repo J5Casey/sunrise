@@ -176,3 +176,129 @@ fn a_write_while_the_local_ender_chest_is_open_survives_closing_it() {
         assert_eq!(game.ender_items[3], Some(new), "closing keeps it");
     });
 }
+
+/// A mod opens the player's ender chest from their own item use, as a satchel would: the
+/// menu opens as the use ends, over their own ender chest with no block, and taking,
+/// placing and shift-clicking move stacks between it and the inventory, none lost or copied.
+#[test]
+#[ignore = "daily"]
+fn an_item_use_opens_the_players_own_ender_chest_and_its_clicks_keep_every_stack() {
+    use mod_api::{
+        Flow, Hooks, HostSide, InteractionResult, ModEntry, Mods, OpenMenuError,
+        RightClickItemEvent, Text,
+    };
+    use std::sync::{Arc, Mutex};
+    use sunrise_client::{items::ItemStack as Stack, lan::menu::Slots};
+    use sunrise_protocol::packets::play::{ContainerClick, Serverbound, UseItem};
+    struct Satchel(Arc<Mutex<Vec<Result<bool, OpenMenuError>>>>);
+    #[mod_api::__subscriptions]
+    impl Hooks for Satchel {
+        fn right_click_item(
+            &self,
+            host: HostSide<'_>,
+            event: &mut RightClickItemEvent<'_>,
+        ) -> Flow {
+            let HostSide::Server(host) = host else {
+                return Flow::Continue;
+            };
+            let player = host.player(event.click.player).unwrap();
+            let opened = player.open_ender_chest(host, Text::literal("Void Satchel"));
+            self.0.lock().unwrap().push(opened);
+            *event.cancellation_result = InteractionResult::SuccessServer;
+            Flow::Cancel
+        }
+    }
+    let answers = Arc::new(Mutex::new(Vec::new()));
+    let mods: Mods = vec![ModEntry::new("satchel", Box::new(Satchel(answers.clone())))].into();
+    crate::game::api_values::install_parts(&mods).unwrap();
+    mod_platform::testing::with_mods(mods, || {
+        with_guests(|game| {
+            // The outer state the record holds in the guest's turn: the window's own chest.
+            game.ender_items = vec![Some(Stack::new("minecraft:dirt", 3)); 27];
+            let hub = &mut game.lan.as_mut().unwrap().hub;
+            hub.guests.update_connection(12, |g| {
+                g.inventory.fill(None);
+                g.inventory[g.selected] = Some(Stack::new("minecraft:stick", 1));
+                g.ender_items = vec![None; 27];
+                g.ender_items[0] = Some(Stack::new("minecraft:stone", 10));
+                g.ender_items[4] = Some(Stack::new("minecraft:diamond", 2));
+            });
+            game.lan_guest_packet(
+                12,
+                Serverbound::UseItem(UseItem {
+                    hand: 0,
+                    yaw: 0.0,
+                    pitch: 0.0,
+                    sequence: 1,
+                }),
+            );
+            assert_eq!(*answers.lock().unwrap(), vec![Ok(true)]);
+            let open = |game: &crate::game::Game<'_>| {
+                let guest = game.lan.as_ref().unwrap().hub.guest(12).unwrap();
+                let menu = guest.menu.as_ref().expect("the ender chest is open");
+                (
+                    menu.window,
+                    menu.registry_id.to_string(),
+                    menu.pos,
+                    menu.slots,
+                )
+            };
+            let (window, kind, pos, slots) = open(game);
+            assert_eq!(kind, "minecraft:generic_9x3");
+            assert_eq!((pos, slots), (None, Slots::Ender));
+            // The client was shown the guest's own chest, not the one their record held in the turn.
+            let guest = game.lan.as_ref().unwrap().hub.guest(12).unwrap();
+            let shown = &guest.menu.as_ref().unwrap().sent;
+            assert_eq!(shown[0], Some(Stack::new("minecraft:stone", 10)));
+            assert_eq!(shown[1], None);
+            let count = |game: &crate::game::Game<'_>, item: &str| {
+                let g = game.lan.as_ref().unwrap().hub.guest(12).unwrap();
+                g.ender_items
+                    .iter()
+                    .chain(&g.inventory)
+                    .chain(std::iter::once(&g.carried))
+                    .flatten()
+                    .filter(|s| s.item.as_ref() == item)
+                    .map(|s| s.count)
+                    .sum::<u32>()
+            };
+            let click = |game: &mut crate::game::Game<'_>, slot: i16, input: i32| {
+                game.lan_guest_packet(
+                    12,
+                    Serverbound::ContainerClick(ContainerClick {
+                        container: window,
+                        state: 0,
+                        slot,
+                        button: 0,
+                        input,
+                        changed: Vec::new(),
+                        carried: None,
+                    }),
+                );
+                assert_eq!(count(game, "minecraft:stone"), 10);
+                assert_eq!(count(game, "minecraft:diamond"), 2);
+                assert_eq!(count(game, "minecraft:dirt"), 0);
+            };
+            // Shift-click the stone into the inventory, take the diamonds, put them in slot 9.
+            click(game, 0, 1);
+            click(game, 4, 0);
+            click(game, 9, 0);
+            let guest = game.lan.as_ref().unwrap().hub.guest(12).unwrap();
+            assert_eq!(guest.ender_items[0], None);
+            assert_eq!(guest.ender_items[4], None);
+            assert_eq!(
+                guest.ender_items[9],
+                Some(Stack::new("minecraft:diamond", 2))
+            );
+            assert_eq!(guest.carried, None);
+            assert!(
+                guest
+                    .inventory
+                    .contains(&Some(Stack::new("minecraft:stone", 10)))
+            );
+            // The window's own chest was never shown nor touched.
+            assert_eq!(game.ender_items[0], Some(Stack::new("minecraft:dirt", 3)));
+            assert_eq!(open(game).0, window);
+        });
+    });
+}
