@@ -150,6 +150,16 @@ pub trait ItemsClientHost {
     #[access(ClientSetup)]
     fn hover_name(&self, stack: &ItemStack) -> String;
     /// Side: client.
+    /// The creative search tab's stacks in order (`CreativeModeTabs.searchTab()`'s
+    /// `getSearchTabDisplayItems`): every item tab's stacks in tab order, each once (the same
+    /// item and components), then the stacks mods add in `build_creative_mode_tab_contents`,
+    /// which join when the tabs are built (the first time the creative inventory opens). The
+    /// operator items tab's only with the last build's `hasPermissions`. A stack's place here
+    /// is its creative order, the order inventory sorters rank by (an item not listed, by its
+    /// first stack). Empty before the game's resources load.
+    #[access(ClientSetup)]
+    fn creative_search_items(&self) -> Vec<ItemStack>;
+    /// Side: client.
     /// Registered enchantments, in registry order.
     #[access(ClientSetup)]
     fn enchantments(&self) -> Vec<EnchantmentInfo>;

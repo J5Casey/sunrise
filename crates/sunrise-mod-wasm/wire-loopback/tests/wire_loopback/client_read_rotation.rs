@@ -18,6 +18,13 @@ impl ItemsClientHost for Client {
             _ => String::new(),
         }
     }
+    fn creative_search_items(&self) -> Vec<ItemStack> {
+        let item = REGISTERED_ITEM.get().unwrap();
+        vec![
+            ItemStack::new(item, 1).unwrap(),
+            ItemStack::new(item, 2).unwrap(),
+        ]
+    }
 }
 impl mod_api::ClientHost for Client {}
 mod_api::impl_client_host_areas!(Client, except(client_view, services, items));
@@ -70,6 +77,12 @@ fn client_reads_and_rotation_keep_literal_values_across_the_host_call() {
         let stack = ItemStack::new(REGISTERED_ITEM.get().unwrap(), count).unwrap();
         assert_eq!(guest::Guest.hover_name(&stack), expected);
     }
+    let order: Vec<u32> = guest::Guest
+        .creative_search_items()
+        .iter()
+        .map(ItemStack::count)
+        .collect();
+    assert_eq!(order, [1, 2]);
     assert_eq!(guest::Guest.client_latency(), Some(87));
     assert_eq!(
         guest::Guest.local_item_use(),
