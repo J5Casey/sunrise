@@ -63,6 +63,8 @@ fn client_placement_predicts_signal_fire_from_a_block_part() {
             root.path().to_path_buf(),
             crate::game::execution_role::ExecutionRole::Client,
             |game| {
+                let (pipe, _server) = sunrise_protocol::connection::Pipe::pair();
+                game.connect_local(pipe, "SmokePrediction").unwrap();
                 game.world
                     .chunks
                     .insert((0, 0), Arc::new(sunrise_client::chunk::Chunk::empty(0, 0)));
