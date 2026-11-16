@@ -27,7 +27,7 @@ pub(super) fn chip(live: bool, label: impl Into<SharedString>) -> Div {
         .h(px(24.))
         .px(px(9.))
         .rounded(px(8.))
-        .font_family(sunrise_theme::glass::FONT)
+        .font_family(sunrise_launcher_theme::glass::FONT)
         .text_size(px(12.))
         .font_weight(FontWeight::MEDIUM)
         .whitespace_nowrap();

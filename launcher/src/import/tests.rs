@@ -70,7 +70,7 @@ fn fake_program() -> Vec<u8> {
         b"ELF"
     };
     let mut bytes = magic.to_vec();
-    bytes.extend_from_slice(&sunrise_mod_package::game_identity::MARK);
+    bytes.extend_from_slice(&sunrise_launcher_hmod::game_identity::MARK);
     bytes
 }
 

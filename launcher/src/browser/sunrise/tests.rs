@@ -1,9 +1,9 @@
-//! The registry source against the sample index of `sunrise_mod_package::index`
-//! (`crates/sunrise-mod-package/tests/index/`), its files served from disk.
+//! The registry source against the sample index of `sunrise_launcher_hmod::index`
+//! (`crates/hmod/tests/index/`), its files served from disk.
 use super::*;
 
 fn fixtures() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../crates/sunrise-mod-package/tests/index")
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("crates/hmod/tests/index")
 }
 
 /// The sample index with its files on disk, as a local test registry lists them.
@@ -204,7 +204,7 @@ fn installed_kind_comes_from_the_archive_not_its_folder() {
             ];
             fs::write(
                 &path,
-                sunrise_mod_package::Package::write_files(&manifest, files).unwrap(),
+                sunrise_launcher_hmod::Package::write_files(&manifest, files).unwrap(),
             )
             .unwrap();
             index::native::Bundle::read(&path).unwrap();

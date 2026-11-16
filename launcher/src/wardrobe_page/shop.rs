@@ -137,7 +137,7 @@ fn tint(slot: &str) -> u32 {
         "emote" => 0x5b8cff,
         "name_tag" => 0xc9c4d8,
         // Sets and the pack.
-        _ => sunrise_theme::glass::ACCENT,
+        _ => sunrise_launcher_theme::glass::ACCENT,
     }
 }
 
@@ -147,7 +147,7 @@ fn ground(colour: Hsla, top: f32) -> [Div; 2] {
     let solid = if ui::light() {
         gpui::white().opacity(0.86)
     } else {
-        ui::color(sunrise_theme::glass::PAGE).opacity(0.84)
+        ui::color(sunrise_launcher_theme::glass::PAGE).opacity(0.84)
     };
     [
         div().absolute().top_0().left_0().size_full().bg(solid),
@@ -615,7 +615,7 @@ impl Launcher {
                 .gap(px(12.))
                 .children(title.map(|s| {
                     div()
-                        .font_family(sunrise_theme::glass::HEADING_FONT)
+                        .font_family(sunrise_launcher_theme::glass::HEADING_FONT)
                         .font_weight(FontWeight::SEMIBOLD)
                         .text_size(px(22.))
                         .text_color(ui::white(ink::FULL))
@@ -732,7 +732,7 @@ impl Launcher {
         let n = unpack(id, c, me).len().to_string();
         let price = self.shop_price(id, c, owned, currency);
         let picture = self.shop_picture(id, HERO, c, me);
-        let accent = ui::color(sunrise_theme::glass::ACCENT);
+        let accent = ui::color(sunrise_launcher_theme::glass::ACCENT);
         let warm = ui::color(tint("head"));
         let open = id.to_owned();
         let opened = id.to_owned();
@@ -788,7 +788,7 @@ impl Launcher {
                     .pr(px(36.))
                     .child(
                         div()
-                            .font_family(sunrise_theme::glass::DISPLAY_FONT)
+                            .font_family(sunrise_launcher_theme::glass::DISPLAY_FONT)
                             .font_weight(FontWeight::SEMIBOLD)
                             .text_size(px(40.))
                             .line_height(px(44.))
@@ -880,7 +880,7 @@ impl Launcher {
             .min_w_0()
             .child(
                 div()
-                    .font_family(sunrise_theme::glass::DISPLAY_FONT)
+                    .font_family(sunrise_launcher_theme::glass::DISPLAY_FONT)
                     .font_weight(FontWeight::SEMIBOLD)
                     .text_size(px(38.))
                     .line_height(px(42.))

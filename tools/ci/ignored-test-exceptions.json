@@ -928,6 +928,14 @@
     "rationale": "Existing explicit manual runner subprocess in tools/ci/ignored-tests/manual-sunrise-mod-package.txt: fixture writer subprocess only. Not selected by daily shards."
   },
   {
+    "package": "sunrise-launcher-hmod",
+    "target": "lib",
+    "test": "holder::game_entry::tests::write_missing_registration_actor",
+    "path": "launcher/crates/hmod/src/holder/game_entry.rs",
+    "reason": "fixture writer subprocess only",
+    "rationale": "Existing explicit manual runner subprocess in tools/ci/ignored-tests/manual-sunrise-launcher-hmod.txt: fixture writer subprocess only. Not selected by daily shards."
+  },
+  {
     "package": "sunrise-mod-vocab",
     "target": "lib",
     "test": "hooks_tests::subscriber_tick_benchmark",

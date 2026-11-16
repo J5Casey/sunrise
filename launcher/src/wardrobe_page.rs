@@ -22,7 +22,7 @@ use std::sync::Arc;
 use sunrise_cosmetics::prefs::{self, Others, Prefs};
 use sunrise_cosmetics::{Item, Slot, Texture};
 use sunrise_launcher::wardrobe::{Catalogue, Change, ClaimState, Error, Saved, Service, Session};
-use sunrise_theme::glass::{fill, ink, radius};
+use sunrise_launcher_theme::glass::{fill, ink, radius};
 
 mod marks;
 mod purchases;

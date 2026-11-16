@@ -7,16 +7,16 @@
 use base64::Engine;
 use std::fs;
 use std::path::Path;
-use sunrise_platform::world::nbt::{self, Compound, JavaString, Limits, NamedTag, Tag};
+use sunrise_launcher_nbt::{self as nbt, Compound, JavaString, Limits, NamedTag, Tag};
 
 const FILE: &str = "servers.dat";
 /// Sunrise's official survival server, named as the game lists it. Its address comes from
 /// `launcher/links.json` on main (`backend::Links`), so a move to a new host needs no release.
 pub const OFFICIAL_NAME: &str = "Sunrise Official";
 /// The game's built-in official server address; the launcher offers only the one links.json names.
-pub const OFFICIAL_ADDRESS: &str = sunrise_telemetry::server_status::OFFICIAL_ADDRESS;
+pub const OFFICIAL_ADDRESS: &str = sunrise_addresses::OFFICIAL_SERVER;
 /// Addresses the official server had before: lists that still hold one are moved to the current one.
-pub const OFFICIAL_PREVIOUS: &[&str] = sunrise_telemetry::server_status::OFFICIAL_PREVIOUS;
+pub const OFFICIAL_PREVIOUS: &[&str] = sunrise_addresses::OFFICIAL_SERVER_PREVIOUS;
 /// Beside servers.dat once the official server was offered, so a player who removes it never
 /// gets it back: the address offered, so a new one moves the list once. The game writes the same file.
 const OFFICIAL_MARKER: &str = "sunrise_official_server.txt";

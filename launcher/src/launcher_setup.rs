@@ -164,7 +164,7 @@ impl Launcher {
             row_menu: Default::default(),
             rail: Default::default(),
             sheet_tab: Default::default(),
-            look: sunrise_theme::glass::Glass::default_look(),
+            look: sunrise_launcher_theme::glass::Glass::default_look(),
             menu_closed_at: None,
             wardrobe: None,
             wardrobe_marks: Default::default(),

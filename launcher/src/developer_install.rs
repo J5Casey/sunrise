@@ -286,7 +286,7 @@ mod tests {
         let program = bin.join(backend::CLIENT);
         fs::write(
             &program,
-            [magic, &sunrise_mod_package::game_identity::MARK[..]].concat(),
+            [magic, &sunrise_launcher_hmod::game_identity::MARK[..]].concat(),
         )
         .unwrap();
         for name in companions {

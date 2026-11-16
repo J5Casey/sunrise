@@ -51,7 +51,7 @@ pub(super) fn tool(rust: &Toolchain, progress: &impl Fn(Step)) -> Result<PathBuf
     let target = rust.host.target;
     let release = format!(
         "{}/{}",
-        sunrise_addresses::MIXINS_TOOL_RELEASES,
+        sunrise_launcher_addresses::MIXINS_TOOL_RELEASES,
         mixins_tool::release_tag()
     );
     let get = |name: &str| {
@@ -128,7 +128,10 @@ fn install(
 fn build(rust: &Toolchain, dir: &Path) -> Result<(), String> {
     let partial = dir.join(".source");
     let top = super::unpack_archive(
-        &format!("{}/{MIXINS_REV}", sunrise_addresses::SUNRISE_MIXINS_SOURCE),
+        &format!(
+            "{}/{MIXINS_REV}",
+            sunrise_launcher_addresses::SUNRISE_MIXINS_SOURCE
+        ),
         &partial,
         256 << 20,
     )?;
