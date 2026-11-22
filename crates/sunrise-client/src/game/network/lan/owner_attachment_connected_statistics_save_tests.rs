@@ -39,44 +39,66 @@ mod owner_attachment_save_tests {
             .flatten()
     }
 
+    /// Set `value` in the map of the player `conn`, as a mod's write does.
+    fn set_value(game: &mut crate::game::Game<'_>, conn: u32, value: i32) {
+        let host = game.lan.as_mut().unwrap();
+        PROGRESS
+            .set(
+                host.hub.guests.attachments_mut(conn).unwrap(),
+                sunrise_mod_runtime::attachments::Holder::Level,
+                value,
+            )
+            .unwrap();
+    }
+
+    /// An integrated host whose owner is its placed player (conn 1, uuid 1).
+    fn owned_host(game: &mut crate::game::Game<'_>) {
+        let _rx = super::super::world_spawn_sync_tests::host_for(game);
+        game.lan.as_mut().unwrap().owner = Some(crate::game::lan::Owner {
+            uuid: 1,
+            saved: None,
+        });
+    }
+
     #[test]
     #[ignore = "daily"]
     fn an_autosave_writes_the_owners_live_attachments_to_the_file_it_loads() {
         let mut resources = None;
         let mut game = crate::game::game_tests::tests::server_game(&mut resources);
-        let _rx = super::super::world_spawn_sync_tests::host_for(&mut game);
-        let uuid = 1;
-        game.lan.as_mut().unwrap().owner = Some(crate::game::lan::Owner { uuid, saved: None });
-        // While the owner plays, its attachments are the game's, not the guest's.
-        PROGRESS
-            .set(
-                &mut game.player_state.attachments,
-                sunrise_mod_runtime::attachments::Holder::Level,
-                7,
-            )
-            .unwrap();
+        owned_host(&mut game);
+        // The integrated server has no player of its own: outside a turn, where
+        // the autosave and the pause save run, the owner's map is their record's.
+        set_value(&mut game, 1, 7);
         assert!(game.store_owner().is_some());
         assert_eq!(
             saved_value(&game),
             Some(7),
             "the autosave stores the live value"
         );
-        let host = game.lan.as_ref().unwrap();
-        let g = host.hub.guests.iter().find(|g| g.uuid == uuid).unwrap();
-        assert!(
-            g.attachments.to_nbt().is_empty(),
-            "the map stays their one owner"
-        );
         // A later change is what the next autosave writes.
-        PROGRESS
-            .set(
-                &mut game.player_state.attachments,
-                sunrise_mod_runtime::attachments::Holder::Level,
-                9,
-            )
-            .unwrap();
+        set_value(&mut game, 1, 9);
         game.store_owner();
         assert_eq!(saved_value(&game), Some(9));
+    }
+
+    #[test]
+    #[ignore = "daily"]
+    fn a_save_in_another_players_turn_writes_the_owners_attachments() {
+        let mut resources = None;
+        let mut game = crate::game::game_tests::tests::server_game(&mut resources);
+        owned_host(&mut game);
+        let other = crate::game::native_player_death::tests::new_guest(2, 2);
+        game.lan.as_mut().unwrap().hub.guests.push(other);
+        set_value(&mut game, 1, 7);
+        set_value(&mut game, 2, 5);
+        // For their turn, the other player's map is the game's.
+        let saved = game
+            .as_guest(2, |game| {
+                assert!(game.store_owner().is_some());
+                saved_value(game)
+            })
+            .unwrap();
+        assert_eq!(saved, Some(7), "the owner's value, not the acting player's");
     }
 }
 

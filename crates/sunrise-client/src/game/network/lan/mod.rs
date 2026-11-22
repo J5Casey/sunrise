@@ -1701,7 +1701,10 @@ impl Game<'_> {
             .iter()
             .position(|g| g.uuid == uuid && g.placed && !self.crash_save.excludes(g.conn))
         {
-            let live = Some(self.player_state.attachments.clone());
+            // The owner's map is the game's only during their own turn
+            // (`guest_turn`); otherwise their record holds it, whoever acts.
+            let live =
+                (self.lan_acting_uuid == Some(uuid)).then(|| self.player_state.attachments.clone());
             host.hub.guests.update(i, |g| {
                 let held = live.map(|a| std::mem::replace(&mut g.attachments, a));
                 playerdata::store(g, &mut self.level, vehicle);
