@@ -120,7 +120,7 @@ pub(super) struct DyingDrops<'a> {
     pub(super) kind: &'a str,
     /// The UUID of a dying player.
     pub(super) player: Option<u128>,
-    /// The killing blow; none when no mod listens.
+    /// The death's source; none when no mod listens.
     pub(super) source: Option<HurtSource<'a>>,
     /// Whether a player hurt it within 100 ticks.
     pub(super) recently_hit: bool,

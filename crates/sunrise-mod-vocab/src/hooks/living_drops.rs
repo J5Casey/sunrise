@@ -15,7 +15,9 @@ pub trait Hooks {
     /// motion and pickup delay its item entity will have. Edit the list (take
     /// out, change or add drops) or set `cancel` for no drops at all; empty
     /// stacks don't drop. `source` is the killing blow (`causing` and `direct`
-    /// entity ids, 0 when none or not known) and `recently_hit` is whether a
+    /// entity ids, 0 when none or not known); a player who dies with no
+    /// recorded blow gets the source `living_death` heard (`generic_kill` for
+    /// `/kill`). `recently_hit` is whether a
     /// player hurt it within 100 ticks, which is what lets a mob drop its
     /// equipment. An armor stand fires it from `brokenByAnything` with an
     /// empty list (its stand item and its equipment pop outside the list, as
