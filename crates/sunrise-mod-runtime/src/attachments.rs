@@ -148,6 +148,9 @@ pub enum Holder {
     Level,
     /// A detached player's map, available only during its clone hook.
     OriginalPlayer(u64),
+    /// The server's own map: one for the whole world, shared by every level, saved with the
+    /// world's other data. Only the logical server has it; a client asking is refused.
+    Server,
 }
 
 /// Whether borrowing a map may create publication authority for a new value.

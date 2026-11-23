@@ -384,6 +384,8 @@ struct GameLevel<'w> {
     positions: piston_carry_state::PositionState<'w>,
     border: &'w sunrise_core::geometry::border::BorderGeometry,
     world: &'w mut World,
+    /// The server's `Holder::Server` map; none on a client.
+    server_attachments: Option<&'w mut mod_api::Attachments>,
     command_block_transition: Option<command_blocks::CommandBlockTransition>,
     redstone_experiments: bool,
     facts: &'w BlockFacts,
@@ -2060,6 +2062,8 @@ struct Game<'a> {
     mount: mounts::MountState,
     stats: stats::Stats,
     score: scoreboard::ScoreState,
+    /// The world's `Holder::Server` attachments, read on first use.
+    server_attachments: server_attachments::ServerAttachments,
     fns: functions::FnState,
     bosses: bossbars::BossState,
     /// `Hud.bossOverlay`: the bars this window is showing.
@@ -3171,6 +3175,8 @@ impl Game<'_> {
             trigger_hooks,
             trigger_extras,
             world: &mut self.world,
+            server_attachments: native_authoritative
+                .then(|| self.server_attachments.map(&self.world_root)),
             facts: self.res.facts(),
             tables: native_block_tables::BlockTables::new(&self.res, &self.pack),
             collision: self.collision,
@@ -6581,6 +6587,7 @@ impl Game<'_> {
         self.end.set_locator(locator);
         self.share_spawn_conditions();
         self.score = Default::default();
+        self.server_attachments = Default::default();
         reset_world_progress(&mut self.adv, &mut self.stats);
         self.reset_creative_contents();
         let stack = self.open_world_datapacks(&level.enabled_features)?;
@@ -11468,6 +11475,7 @@ impl<'a> Game<'a> {
             mount: Default::default(),
             stats: Default::default(),
             score: Default::default(),
+            server_attachments: Default::default(),
             fns: Default::default(),
             bosses: Default::default(),
             boss_overlay: Default::default(),
